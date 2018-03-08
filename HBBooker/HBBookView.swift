@@ -75,11 +75,12 @@ open class HBBookView: UIView, HBPageViewDelegate {
 extension HBBookView {
     public func pageMoved(ratio: CGFloat, page: HBPageView) {
         /// Update whole position
+        print("❤️ ratio -> \(ratio)")
         if ratio <= 1 {
             for i in (0 ..< totalPages.count).reversed() {
                 let _page = totalPages[i]
+                let index : CGFloat = CGFloat(i) - ratio
                 if _page != page {
-                    let index : CGFloat = CGFloat(i) - ratio
                     setPageFrame(page: _page, index: max(index, 0))
                 }
             }
@@ -125,17 +126,15 @@ extension HBBookView {
             }
         }
     }
+    
     /// Frame
     func setPageFrame(page: HBPageView, index: CGFloat) -> () {
         let _width : CGFloat = bounds.width - 2 * index * pageMargin
         let _height : CGFloat = bounds.height - CGFloat(visibleNumber - 1) * pageMargin
-        UIView.animate(withDuration: HBPageParam.cardResetAnimationDuration, delay: 0, options: .curveEaseInOut, animations: {
-            page.transform = CGAffineTransform.init(translationX: -index * self.pageMargin, y: -index * self.pageMargin)
-            page.frame = CGRect.init(x: index * self.pageMargin, y: index * self.pageMargin, width: _width, height: _height)
-        }, completion: {(true) in
-            page.pop_removeAllAnimations()
-            page.alpha = 1
-        })
+        page.transform = CGAffineTransform.init(translationX: -index * self.pageMargin, y: -index * self.pageMargin)
+        page.frame = CGRect.init(x: index * self.pageMargin, y: index * self.pageMargin, width: _width, height: _height)
+        page.pop_removeAllAnimations()
+        page.alpha = 1
     }
     
     /// Create Page

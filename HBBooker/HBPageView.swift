@@ -35,6 +35,7 @@ open class HBPageView: UIView ,UIGestureRecognizerDelegate {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        layer.cornerRadius = 10
         panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(panGestureRecognized(_:)))
         addGestureRecognizer(panGestureRecognizer)
         panGestureRecognizer.delegate = self

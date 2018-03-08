@@ -17,11 +17,16 @@ class TestPageView: HBPageView {
             setNeedsLayout()
         }
     }
+    
+    var imageView = UIImageView()
+    
 
     fileprivate var indexLabel : UILabel = UILabel()
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .red
+        imageView.image = #imageLiteral(resourceName: "Test7")
+        addSubview(imageView)
         indexLabel.font = UIFont.systemFont(ofSize: 50)
         indexLabel.textColor = UIColor.brown
         indexLabel.textAlignment = .center
@@ -35,6 +40,7 @@ class TestPageView: HBPageView {
     override func layoutSubviews() {
         super.layoutSubviews()
         indexLabel.sizeToFit()
+        imageView.frame = bounds
         indexLabel.frame = CGRect.init(x: (bounds.width - indexLabel.bounds.width) / 2, y: (bounds.width - indexLabel.bounds.height) / 2, width: indexLabel.bounds.width, height: indexLabel.bounds.height)
     }
     
