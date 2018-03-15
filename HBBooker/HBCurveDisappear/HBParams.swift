@@ -34,3 +34,30 @@ extension Array {
         return nil
     }
 }
+
+
+
+/**
+ RGBA颜色
+ 
+ - parameter colorValue: 颜色值，16进制表示，如：0xffffff
+ - parameter alpha:      透明度值
+ 
+ - returns: 相应颜色
+ */
+func RGBA(_ colorValue: UInt32, alpha: CGFloat) -> UIColor {
+    
+    return UIColor.init(red: CGFloat((colorValue>>16)&0xFF)/256.0, green: CGFloat((colorValue>>8)&0xFF)/256.0, blue: CGFloat((colorValue)&0xFF)/256.0 , alpha: alpha)
+}
+
+/**
+ RGB颜色
+ 
+ - parameter colorValue: 颜色值，16进制表示，如：0xffffff
+ 
+ - returns: 相应颜色
+ */
+func RGB(_ colorValue: UInt32) -> UIColor {
+    return RGBA(colorValue, alpha: 1.0)
+}
+

@@ -8,29 +8,26 @@
 
 import UIKit
 
-class ViewController: UIViewController, HBBookViewDelegate, HBBookViewDataSource {
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
-    let bookView = HBBookView()
-    let reloadBtn = UIButton()
+    fileprivate var operatorTableView : UITableView = UITableView()
+    fileprivate var titles : [String] = ["翻页消失","翻页可回"]
+    fileprivate var controllers : [UIViewController] = [UIViewController]()
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .gray
-        bookView.frame = CGRect.init(x: 20, y: 20, width: view.bounds.width - 40, height: view.bounds.height * 0.5)
-        bookView.delegate = self
-        bookView.dataSource = self
-        bookView.register(pageClass: TestPageView.self, reuseIdentifier: "TestPageView")
-        bookView.reloadData()
-        view.addSubview(bookView)
-        reloadBtn.frame = CGRect.init(x: (view.bounds.width - 100) / 2, y: bookView.frame.maxY + 50, width: 100, height: 30)
-        reloadBtn.addTarget(self, action: #selector(reload), for: .touchUpInside)
-        reloadBtn.setTitle("Reload", for: .normal)
-        reloadBtn.setTitleColor(.blue, for: .normal)
-        reloadBtn.titleLabel?.font = UIFont.systemFont(ofSize: 28)
-        view.addSubview(reloadBtn)
-    }
-    
-    @objc func reload() -> () {
-        bookView.reloadData()
+        var naviHeight : CGFloat = 0
+        if let _naviHeight = self.navigationController?.navigationBar.bounds.height {
+            naviHeight = _naviHeight
+        }
+        
+        controllers = [HBCurveDisappearController(),HBCurveBackController()]
+        
+        operatorTableView.frame = CGRect.init(x: 0, y: naviHeight, width: view.bounds.width, height: view.bounds.height - naviHeight)
+        operatorTableView.delegate = self
+        operatorTableView.dataSource = self
+        operatorTableView.backgroundColor = RGB(0xf7f7f8)
+        view.addSubview(operatorTableView)
     }
 
     override func didReceiveMemoryWarning() {
@@ -38,27 +35,33 @@ class ViewController: UIViewController, HBBookViewDelegate, HBBookViewDataSource
         // Dispose of any resources that can be recreated.
     }
 
-
 }
 
-///HBBookViewDelegate
 extension ViewController {
-    func hb_pageTapped(index: Int) {
-        
-    }
-}
-
-///HBBookViewDataSource
-extension ViewController {
-    func hb_pageNumber(_ bookView: HBBookView) -> Int {
-        return 5
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
     }
     
-    func hb_pageContent(_ bookView: HBBookView, index: Int) -> HBPageView {
-        if let page = bookView.dequeueReusablePage(withIdentifier: "TestPageView", index: index) as? TestPageView {
-            page.index = index
-            return page
-        }
-        return TestPageView()
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return titles.count
     }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        var cell = tableView.dequeueReusableCell(withIdentifier: "cell")
+        if cell == nil {
+            cell = UITableViewCell.init(style: .default, reuseIdentifier: "cell")
+        }
+        cell?.textLabel?.text = titles[indexPath.row]
+        return cell ?? UITableViewCell()
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 55
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let controller = controllers[indexPath.row]
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
+    
 }

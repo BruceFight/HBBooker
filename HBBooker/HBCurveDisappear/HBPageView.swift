@@ -73,7 +73,7 @@ extension HBPageView {
             transform = CATransform3DRotate(transform, rotationAngle, 0, 0, 1)
             transform = CATransform3DTranslate(transform, dragDistance.x, dragDistance.y, 0)
             layer.transform = transform
-            
+            print("dragDistance.y -- \(dragDistance.y)")
             if let _delegate = delegate {
                 xPositionRatio = abs(dragDistance.x) / (bounds.width / 2)
                 _delegate.pageMoved(ratio: min(xPositionRatio, 1), page: self)
