@@ -17,7 +17,7 @@ public enum HBDragSpeed: TimeInterval {
 }
 
 /// 方向
-enum HBDirection {
+public enum HBDirection {
     case left
     case right
 }

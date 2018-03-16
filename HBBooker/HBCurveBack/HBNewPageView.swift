@@ -10,12 +10,16 @@ import UIKit
 import pop
 
 public protocol HBNewPageViewDelegate : class {
-    /// 页面移动比例
-    func pageMoved(ratio: CGFloat, page: HBNewPageView) -> ()
-    /// 页面回滚比例
-    func pageMovedBack(ratio: CGFloat, page: HBNewPageView) -> ()
-    /// 页面本轮生命周期结束
-    func pageRemoved(page: HBNewPageView) -> ()
+//    /// 页面移动比例
+//    func pageMoved(ratio: CGFloat, page: HBNewPageView) -> ()
+//    /// 页面回滚比例
+//    func pageMovedBack(ratio: CGFloat, page: HBNewPageView) -> ()
+//    /// 页面本轮生命周期结束
+//    func pageRemoved(page: HBNewPageView) -> ()
+    
+    /// 页面点击
+    func pageTapped(page: HBNewPageView) -> ()
+    
 }
 
 open class HBNewPageView: UIView ,UIGestureRecognizerDelegate {
@@ -27,6 +31,7 @@ open class HBNewPageView: UIView ,UIGestureRecognizerDelegate {
     public weak var delegate : HBNewPageViewDelegate?
     
     private var panGestureRecognizer: UIPanGestureRecognizer!
+    //private var tapGestureRecognizer: UIPanGestureRecognizer!
     private var dragDistance = CGPoint.zero
     private var rotationMax : CGFloat = 1.0
     private var scaleMin : CGFloat = 0.8
@@ -41,6 +46,12 @@ open class HBNewPageView: UIView ,UIGestureRecognizerDelegate {
         //panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(panGestureRecognized(_:)))
         //addGestureRecognizer(panGestureRecognizer)
         //panGestureRecognizer.delegate = self
+        let tapGestureRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(tap))
+        addGestureRecognizer(tapGestureRecognizer)
+    }
+    
+    @objc func tap() -> () {
+        delegate?.pageTapped(page: self)
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -78,7 +89,7 @@ extension HBNewPageView {
             
             if let _delegate = delegate {
                 xPositionRatio = abs(dragDistance.x) / (bounds.width / 2)
-                _delegate.pageMoved(ratio: min(xPositionRatio, 1), page: self)
+                //_delegate.pageMoved(ratio: min(xPositionRatio, 1), page: self)
             }
         case .ended:
             gestureEnd()
@@ -115,13 +126,13 @@ extension HBNewPageView {
             translationAnimation?.completionBlock = { _, _ in
                 self.removeFromSuperview()
                 if let _delegate = self.delegate {
-                    _delegate.pageRemoved(page: self)
+                    //_delegate.pageRemoved(page: self)
                 }
             }
             layer.pop_add(translationAnimation, forKey: "swipeTranslationAnimation")
         }else {
             if let _delegate = delegate {
-                _delegate.pageMoved(ratio: 0, page: self)
+                //_delegate.pageMoved(ratio: 0, page: self)
             }
             
             let resetPositionAnimation = POPSpringAnimation(propertyNamed: kPOPLayerTranslationXY)

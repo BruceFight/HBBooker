@@ -18,7 +18,7 @@ class HBCurveBackController: UIViewController, HBNewBookViewDelegate, HBNewBookV
         bookView.delegate = self
         bookView.dataSource = self
         bookView.register(pageClass: TestNewPageView.self, reuseIdentifier: "TestNewPageView")
-        bookView.reloadData()
+        //bookView.reloadData()
         view.addSubview(bookView)
     }
 
@@ -35,14 +35,14 @@ class HBCurveBackController: UIViewController, HBNewBookViewDelegate, HBNewBookV
 ///HBBookViewDelegate
 extension HBCurveBackController {
     func hb_pageTapped(index: Int) {
-        
+        print("❤️ dataPosition ::: \(index)")
     }
 }
 
 ///HBBookViewDataSource
 extension HBCurveBackController {
     func hb_pageNumber(_ bookView: HBNewBookView) -> Int {
-        return 5
+        return 4
     }
     
     func hb_pageContent(_ bookView: HBNewBookView, index: Int) -> HBNewPageView {
