@@ -281,20 +281,22 @@ extension HBNewBookView {
     }
     
     /// setTransform
-    func setTransform(page: UIView,angle: CGFloat,transX: CGFloat,transY: CGFloat) -> () {
+    func setTransform(page: UIView,angle: CGFloat,transX: CGFloat,transY: CGFloat = 1,scale: CGFloat = 1) -> () {
+        /*
         let rotate = CGAffineTransform.init(rotationAngle: angle)
         let move = CGAffineTransform.init(translationX: transX, y: transY)
         page.transform = rotate.concatenating(move)
+        */
+        var transform = CATransform3DIdentity
+        transform = CATransform3DTranslate(transform, transX, transY, 0)
+        transform = CATransform3DRotate(transform, angle, 0, 0, 1)
+        transform = CATransform3DScale(transform, scale, scale, 1)
+        page.layer.transform = transform
     }
     /*
      page.layer.anchorPoint = CGPoint.init(x: 0.5, y: 0.5)
      page.layer.position = CGPoint.init(x: page.bounds.width / 2, y: page.bounds.height / 2)
      page.layer.transform = CATransform3DIdentity
-     
-     var transform = CATransform3DIdentity
-     transform = CATransform3DTranslate(transform, transX, transY, 0)
-     transform = CATransform3DRotate(transform, angle, 0, 1, 0)
-     page.layer.transform = transform
      */
     
     /// 下一页
