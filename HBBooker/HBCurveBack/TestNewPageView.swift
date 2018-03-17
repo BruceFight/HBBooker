@@ -10,9 +10,9 @@ import UIKit
 
 class TestNewPageView: HBNewPageView {
 
-    var index : Int = 0 {
+    var index : String = "" {
         didSet{
-            indexLabel.text = "\(index)"
+            indexLabel.text = index
             setNeedsLayout()
         }
     }

@@ -60,8 +60,13 @@ extension ViewController {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let controller = controllers[indexPath.row]
-        self.navigationController?.pushViewController(controller, animated: true)
+        if indexPath.row == 0 {
+            let controller = controllers[indexPath.row]
+            self.navigationController?.pushViewController(controller, animated: true)
+        }else {
+            let c = HBCurveBackController()
+            self.navigationController?.pushViewController(c, animated: true)
+        }
     }
     
 }
