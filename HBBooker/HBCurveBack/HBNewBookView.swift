@@ -40,11 +40,11 @@ open class HBNewBookView: UIView, HBNewPageViewDelegate {
     private var PageClass : AnyClass?
     typealias RemoveDone = ((_ ifDone: Bool) -> ())?
     fileprivate var animationDuration : TimeInterval = 0.2
+    fileprivate var rotationAngle : CGFloat = CGFloat.pi / 12
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .blue
-        
+        backgroundColor = .white
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -269,7 +269,6 @@ extension HBNewBookView {
         let _height : CGFloat = bounds.height - CGFloat(visibleNumber - 1) * pageMargin
         page.transform = CGAffineTransform.init(translationX: -index * self.pageMargin, y: -index * self.pageMargin)
         page.frame = CGRect.init(x: index * self.pageMargin, y: index * self.pageMargin, width: _width, height: _height)
-        page.pop_removeAllAnimations()
     }
     
     /// Create Page
@@ -280,6 +279,23 @@ extension HBNewBookView {
         page.inQueue = inQueue
         return page
     }
+    
+    /// setTransform
+    func setTransform(page: UIView,angle: CGFloat,transX: CGFloat,transY: CGFloat) -> () {
+        let rotate = CGAffineTransform.init(rotationAngle: angle)
+        let move = CGAffineTransform.init(translationX: transX, y: transY)
+        page.transform = rotate.concatenating(move)
+    }
+    /*
+     page.layer.anchorPoint = CGPoint.init(x: 0.5, y: 0.5)
+     page.layer.position = CGPoint.init(x: page.bounds.width / 2, y: page.bounds.height / 2)
+     page.layer.transform = CATransform3DIdentity
+     
+     var transform = CATransform3DIdentity
+     transform = CATransform3DTranslate(transform, transX, transY, 0)
+     transform = CATransform3DRotate(transform, angle, 0, 1, 0)
+     page.layer.transform = transform
+     */
     
     /// 下一页
     fileprivate func nextData(current: NSInteger) -> NSInteger {
@@ -331,9 +347,7 @@ extension HBNewBookView {
                 self.touchIn = true
                 if previousPage == currentPage {
                     UIView.animate(withDuration: animationDuration, animations: {
-                        let rotate = CGAffineTransform.init(rotationAngle: 0)
-                        let move = CGAffineTransform.init(translationX: 0, y: 0)
-                        _currentPage.transform = rotate.concatenating(move)
+                        self.setTransform(page: _currentPage, angle: 0, transX: 0, transY: 0)
                     }, completion: { (true) in
                         self.fly(_currentPage: _currentPage, done: done)
                     })
@@ -347,9 +361,7 @@ extension HBNewBookView {
     /// 飞
     func fly(_currentPage: HBNewPageView,done: ((_ position: Int) -> (Bool))?) -> () {
         UIView.animate(withDuration: animationDuration, animations: {
-            let rotate = CGAffineTransform.init(rotationAngle: CGFloat.pi / 12)
-            let move = CGAffineTransform.init(translationX: self.bounds.width, y: -UIScreen.main.bounds.height)
-            _currentPage.transform = rotate.concatenating(move)
+            self.setTransform(page: _currentPage, angle: self.rotationAngle, transX: self.bounds.width, transY: -UIScreen.main.bounds.height)
             self.pageRemove(removedPage: _currentPage)
         }, completion: { (true) in
             _currentPage.alpha = 0
@@ -419,13 +431,11 @@ extension HBNewBookView {
         }else {
             _currentPage.removeFromSuperview()
             if self.totalPageNumber == 1 {
-                if let _pre = self.previousPage {
+                if let _previousPage = self.previousPage {
                     UIView.animate(withDuration: animationDuration, animations: {
-                        let rotate = CGAffineTransform.init(rotationAngle: 0)
-                        let move = CGAffineTransform.init(translationX: 0, y: 0)
-                        _pre.transform = rotate.concatenating(move)
+                        self.setTransform(page: _previousPage, angle: 0, transX: 0, transY: 0)
                     }, completion: { (true) in
-                        self.currentPage = _pre
+                        self.currentPage = _previousPage
                         self.touchIn = false
                     })
                 }else {
@@ -451,11 +461,9 @@ extension HBNewBookView {
         if let _currentPage = currentPage {
             if _currentPage.frame.origin.x <= -(self.bounds.width * 1.2) { return }
             if moveRatio >= 0 {
-                pageMoved(ratio: moveRatio, page: _currentPage, direction: .left)
+                self.pageMoved(ratio: self.moveRatio, page: _currentPage, direction: .left)
                 UIView.animate(withDuration: animationDuration, animations: {
-                    let rotate = CGAffineTransform.init(rotationAngle: -(CGFloat.pi / 12 * self.moveRatio))
-                    let move = CGAffineTransform.init(translationX: -(self.bounds.width * self.moveRatio), y: 0)
-                    _currentPage.transform = rotate.concatenating(move)
+                    self.setTransform(page: _currentPage, angle: -(self.rotationAngle * self.moveRatio), transX: -(self.bounds.width * self.moveRatio), transY: 0)
                 }, completion: { (true) in})
             }
         }
@@ -476,11 +484,9 @@ extension HBNewBookView {
     func leftDoneAnimation() -> () {
         if let _currentPage = currentPage {
             if moveRatio >= 0 {
-                pageMoved(ratio: moveRatio, page: _currentPage, direction: .left)
+                self.pageMoved(ratio: self.moveRatio, page: _currentPage, direction: .left)
                 UIView.animate(withDuration: animationDuration, animations: {
-                    let rotate = CGAffineTransform.init(rotationAngle: -(CGFloat.pi / 12 * self.moveRatio))
-                    let move = CGAffineTransform.init(translationX: -(self.bounds.width * self.moveRatio), y: 0)
-                    _currentPage.transform = rotate.concatenating(move)
+                    self.setTransform(page: _currentPage, angle: -(self.rotationAngle * self.moveRatio), transX: -(self.bounds.width * self.moveRatio), transY: 0)
                 }, completion: { (true) in
                     if self.moveRatio >= 1 {
                         /// 更新previousPage
@@ -508,9 +514,7 @@ extension HBNewBookView {
                                     self.totalPages[0] = _prePage
                                     self.insertSubview(_prePage, aboveSubview: _currentPage)
                                     UIView.animate(withDuration: self.animationDuration, animations: {
-                                        let rotate = CGAffineTransform.init(rotationAngle: -(CGFloat.pi / 12 * 1.2))
-                                        let move = CGAffineTransform.init(translationX: -(self.bounds.width * 1.2), y: 0)
-                                        _prePage.transform = rotate.concatenating(move)
+                                        self.setTransform(page: _prePage, angle: -(self.rotationAngle * 1.2), transX: -(self.bounds.width * 1.2), transY: 0)
                                     }, completion: { (true) in
                                         _prePage.alpha = 1
                                         self.touchIn = false
@@ -535,11 +539,9 @@ extension HBNewBookView {
         if let _previousPage = previousPage {
             if _previousPage.frame.origin.x == 0 { return }
             if moveRatio <= 0 {
-                pageMoved(ratio: moveRatio, page: _previousPage, direction: .right)
+                self.pageMoved(ratio: self.moveRatio, page: _previousPage, direction: .right)
                 UIView.animate(withDuration: animationDuration, animations: {
-                    let rotate = CGAffineTransform.init(rotationAngle: -(CGFloat.pi / 12 * (1 + self.moveRatio)))
-                    let move = CGAffineTransform.init(translationX: -(self.bounds.width * (1 + self.moveRatio)), y: 0)
-                    _previousPage.transform = rotate.concatenating(move)
+                    self.setTransform(page: _previousPage, angle: -(self.rotationAngle * (1 + self.moveRatio)), transX: -(self.bounds.width * (1 + self.moveRatio)), transY: 0)
                 }, completion: { (true) in })
             }
         }
@@ -560,20 +562,16 @@ extension HBNewBookView {
     func rightDoneAnimation() -> () {
         if let _previousPage = previousPage {
             if moveRatio >= 0 {
-                pageMoved(ratio: moveRatio, page: _previousPage, direction: .right)
+                self.pageMoved(ratio: self.moveRatio, page: _previousPage, direction: .right)
                 UIView.animate(withDuration: animationDuration, animations: {
-                    let rotate = CGAffineTransform.init(rotationAngle: -(CGFloat.pi / 12 * (1.2)))
-                    let move = CGAffineTransform.init(translationX: -(self.bounds.width * (1.2)), y: 0)
-                    _previousPage.transform = rotate.concatenating(move)
+                    self.setTransform(page: _previousPage, angle: -(self.rotationAngle * 1.2), transX: -(self.bounds.width * 1.2), transY: 0)
                 }, completion: { (true) in
                     self.touchIn = false
                 })
             }else {
-                pageMoved(ratio: moveRatio, page: _previousPage, direction: .right)
+                self.pageMoved(ratio: self.moveRatio, page: _previousPage, direction: .right)
                 UIView.animate(withDuration: animationDuration, animations: {
-                    let rotate = CGAffineTransform.init(rotationAngle: -(CGFloat.pi / 12 * (1 + self.moveRatio)))
-                    let move = CGAffineTransform.init(translationX: -(self.bounds.width * (1 + self.moveRatio)), y: 0)
-                    _previousPage.transform = rotate.concatenating(move)
+                    self.setTransform(page: _previousPage, angle: -(self.rotationAngle * (1 + self.moveRatio)), transX: -(self.bounds.width * (1 + self.moveRatio)), transY: 0)
                 }, completion: { (true) in
                     self.currentPage = _previousPage
                     if self.totalPageNumber <= 1 {
@@ -594,9 +592,7 @@ extension HBNewBookView {
                             self.totalPages[0] = _prePage
                             self.insertSubview(_prePage, aboveSubview: _previousPage)
                             UIView.animate(withDuration: self.animationDuration, animations: {
-                                let rotate = CGAffineTransform.init(rotationAngle: -(CGFloat.pi / 12 * 1.2))
-                                let move = CGAffineTransform.init(translationX: -(self.bounds.width * 1.2), y: 0)
-                                _prePage.transform = rotate.concatenating(move)
+                                 self.setTransform(page: _prePage, angle: -(self.rotationAngle * 1.2), transX: -(self.bounds.width * 1.2), transY: 0)
                             }, completion: { (true) in
                                 _prePage.alpha = 1
                                 self.previousPage = _prePage

@@ -24,12 +24,13 @@ class TestNewPageView: HBNewPageView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .red
-        imageView.image = #imageLiteral(resourceName: "Test7")
+        imageView.image = #imageLiteral(resourceName: "lufei")
         addSubview(imageView)
         indexLabel.font = UIFont.systemFont(ofSize: 50)
-        indexLabel.textColor = UIColor.brown
+        indexLabel.textColor = UIColor.red
         indexLabel.textAlignment = .center
         addSubview(indexLabel)
+
     }
     
     required public init?(coder aDecoder: NSCoder) {
