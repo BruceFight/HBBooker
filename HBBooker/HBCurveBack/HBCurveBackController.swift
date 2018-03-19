@@ -73,7 +73,11 @@ class HBCurveBackController: UIViewController, HBNewBookViewDelegate, HBNewBookV
 ///HBBookViewDelegate
 extension HBCurveBackController {
     func hb_pageTapped(index: Int) {
-        print("❤️ dataPosition ::: \(index)")
+        print("❤️ page tapped ::: \(index)")
+    }
+    
+    func hb_pageTo(index: Int) {
+        print("❤️❤️ page move to ::: \(index)")
     }
 }
 

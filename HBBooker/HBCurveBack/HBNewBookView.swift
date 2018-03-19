@@ -11,6 +11,8 @@ import UIKit
 public protocol HBNewBookViewDelegate : class {
     /// 点击某页
     func hb_pageTapped(index: Int) -> ()
+    /// 页面翻到了(index位置)
+    func hb_pageTo(index: Int) -> ()
 }
 
 public protocol HBNewBookViewDataSource : class {
@@ -34,8 +36,10 @@ open class HBNewBookView: UIView, HBNewPageViewDelegate {
     var reuseIdentifier : String = ""
     /// 页-页差
     var pageMargin : CGFloat = 15
-    /// 当前位置
+    /// (Data)当前位置
     var dataPosition : Int = 0
+    /// (Page)当前位置 <<<暂时无用>>>
+    var pagePosition : Int = 0
     
     private var PageClass : AnyClass?
     typealias RemoveDone = ((_ ifDone: Bool) -> ())?
@@ -86,42 +90,53 @@ extension HBNewBookView {
                 if self.touchIn == false {
                     if secondTouchPoint.x > firstTouchPoint.x {
                         direction = .right
-                        
+                        if let _pre = previousPage {
+                            reloadPage(item: self.preData(current: self.dataPosition), page: _pre)
+                        }
                     }else if secondTouchPoint.x < firstTouchPoint.x {
                         direction = .left
                         if let _pre = previousPage {
-                            if self.totalPageNumber >= self.totalPages.count {
-                                /// 卡片为1
-                                if self.totalPageNumber <= 1 {
-                                    return
+                            /// 卡片为1
+                            if self.totalPageNumber <= 1 {
+                                return
+                            }
+                            /// 卡片 > 1 && 卡片 < self.visibleNumber + 1
+                            var lastPosition : Int = self.dataPosition
+                            if self.totalPageNumber >= self.visibleNumber + 1 {
+                                lastPosition = self.nextData(current: self.nextData(current: self.nextData(current: self.dataPosition)))
+                            /// 卡片 > self.visibleNumber + 1
+                            }else if self.totalPageNumber > 1 && self.totalPageNumber < self.visibleNumber + 1 {
+                                for _ in 0 ..< self.totalPageNumber - 1 {
+                                    lastPosition = self.nextData(current: lastPosition)
                                 }
-                                /// 卡片 > 1 && 卡片 < self.visibleNumber + 1
-                                var lastPosition : Int = self.dataPosition
-                                if self.totalPageNumber >= self.visibleNumber + 1 {
-                                    lastPosition = self.nextData(current: self.nextData(current: self.nextData(current: self.dataPosition)))
-                                /// 卡片 > self.visibleNumber + 1
-                                }else if self.totalPageNumber > 1 && self.totalPageNumber < self.visibleNumber + 1 {
-                                    for _ in 0 ..< self.totalPageNumber - 1 {
-                                        lastPosition = self.nextData(current: lastPosition)
-                                    }
+                            }
+                            
+                            _pre.inQueue = false
+                            _pre.alpha = 0
+                            _pre.transform = .identity
+                            self.totalPages.append(_pre)
+                            self.totalPages.removeFirst()
+                            if let _dataSource = self.dataSource {
+                                let _newPage = _dataSource.hb_pageContent(self, index: lastPosition)
+                                insertSubview(_newPage, at: 0)
+                                let lastIndex : Int = self.totalPages.count - 1
+                                if let _ = self.totalPages.hb_object(for: lastIndex) {
+                                    self.setPageFrame(page: _newPage, index: CGFloat(lastIndex))
+                                    self.totalPages[lastIndex] = _newPage
+                                    pagePosition = 0
                                 }
-                                
-                                _pre.inQueue = false
-                                _pre.alpha = 0
-                                _pre.transform = .identity
-                                self.totalPages.append(_pre)
-                                self.totalPages.removeFirst()
-                                if let _dataSource = self.dataSource {
-                                    let _newPage = _dataSource.hb_pageContent(self, index: lastPosition)
-                                    insertSubview(_newPage, at: 0)
-                                    let lastIndex : Int = self.totalPages.count - 1
-                                    if let _ = self.totalPages.hb_object(for: lastIndex) {
-                                        self.setPageFrame(page: _newPage, index: CGFloat(lastIndex))
-                                        self.totalPages[lastIndex] = _newPage
-                                    }
-                                }
-                            }else {
-                                self.totalPages.removeFirst()
+                            }
+                        }else {
+                            pagePosition = 0
+                        }
+                    }
+                    
+                    if let _currentPage = currentPage {
+                        for i in 0 ..< totalPages.count {
+                            let page = totalPages[i]
+                            if page == _currentPage {
+                                reloadPage(item: self.nextData(current: self.dataPosition), page: totalPages[self.nextPage(current: i)])
+                                break
                             }
                         }
                     }
@@ -129,6 +144,10 @@ extension HBNewBookView {
                 }
             }
         }
+    }
+    
+    func reloadNextVisiblePage(index: Int) -> () {
+        
     }
     
     open override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -299,7 +318,7 @@ extension HBNewBookView {
      page.layer.transform = CATransform3DIdentity
      */
     
-    /// 下一页
+    /// 下一页(数据)
     fileprivate func nextData(current: NSInteger) -> NSInteger {
         let total = self.totalPageNumber
         if total > 0 {
@@ -308,9 +327,27 @@ extension HBNewBookView {
         return 0
     }
     
-    /// 上一页
+    /// 上一页(数据)
     fileprivate func preData(current: NSInteger) -> NSInteger {
         let total = self.totalPageNumber
+        if total > 0 {
+            return (current - 1 + total) % total // 队列指针-1
+        }
+        return 0
+    }
+    
+    /// 下一页(Page)
+    fileprivate func nextPage(current: NSInteger) -> NSInteger {
+        let total = self.totalPages.count
+        if total > 0 {
+            return (current + 1) % total //队列指针+1
+        }
+        return 0
+    }
+    
+    /// 上一页(Page)
+    fileprivate func prePage(current: NSInteger) -> NSInteger {
+        let total = self.totalPages.count
         if total > 0 {
             return (current - 1 + total) % total // 队列指针-1
         }
@@ -337,7 +374,7 @@ extension HBNewBookView {
         }
     }
     
-    /// realoda item
+    /// realoda item (默认刷新当前页)
     func reload(item: Int) -> () {
         if let _dataSource = dataSource {
             let totalNumber = _dataSource.hb_pageNumber(self)
@@ -345,15 +382,20 @@ extension HBNewBookView {
                 return
             }
             
-            if let _currentPage = currentPage {
-                for i in 0 ..< totalPages.count {
-                    let page = totalPages[i]
-                    if page == _currentPage {
-                        page.inQueue = false
-                        let _newPage = _dataSource.hb_pageContent(self, index: item)
-                        totalPages[i] = _newPage
-                        break
-                    }
+            reloadPage(item: item, page: currentPage)
+        }
+    }
+    
+    ///
+    func reloadPage(item: Int,page: HBNewPageView?) -> () {
+        if let _dataSource = dataSource {
+            for i in 0 ..< totalPages.count {
+                let _page = totalPages[i]
+                if _page == page {
+                    _page.inQueue = false
+                    let _newPage = _dataSource.hb_pageContent(self, index: item)
+                    totalPages[i] = _newPage
+                    break
                 }
             }
         }
@@ -521,6 +563,13 @@ extension HBNewBookView {
         leftDoneAnimation()
     }
     
+    func pageMoveDone() -> () {
+        self.touchIn = false
+        if let _delegate = delegate {
+            _delegate.hb_pageTo(index: dataPosition)
+        }
+    }
+    
     /// 左划完成动画
     func leftDoneAnimation() -> () {
         if let _currentPage = currentPage {
@@ -534,12 +583,14 @@ extension HBNewBookView {
                         self.previousPage = _currentPage
                         /// 更新数据数组位置
                         self.dataPosition = self.nextData(current: self.dataPosition)
-                        print("❤️ dataPosition --- \(self.dataPosition)")
                         /// 找到下一页,并确立为当前页
-                        if let nextPage = self.totalPages.hb_object(for: 1) {
-                            self.currentPage = nextPage
+                        if let _nextPage = self.totalPages.hb_object(for: 1) {
+                            self.currentPage = _nextPage
                         }
-                        self.touchIn = false
+                        /// 卡片移动完成
+                        self.pageMoveDone()
+                        
+                        self.pagePosition = 1
                     }else {
                         /// 左划取消的时候,根据是否有前页---> 
                         /// 如果有前页,取出并获取对应位置数据,贴在数组和界面的最前面
@@ -558,20 +609,22 @@ extension HBNewBookView {
                                         self.setTransform(page: _prePage, angle: -(self.rotationAngle * 1.2), transX: -(self.bounds.width * 1.2), transY: 0)
                                     }, completion: { (true) in
                                         _prePage.alpha = 1
-                                        self.touchIn = false
+                                        self.pagePosition = 1
+                                        self.pageMoveDone()
                                     })
                                 }
                             }
                         }else {
-                            self.touchIn = false
+                            self.pagePosition = 0
+                            self.pageMoveDone()
                         }
                     }
                 })
             }else {
-                self.touchIn = false
+                self.pageMoveDone()
             }
         }else {
-            self.touchIn = false
+            self.pageMoveDone()
         }
     }
     
@@ -607,7 +660,8 @@ extension HBNewBookView {
                 UIView.animate(withDuration: animationDuration, animations: {
                     self.setTransform(page: _previousPage, angle: -(self.rotationAngle * 1.2), transX: -(self.bounds.width * 1.2), transY: 0)
                 }, completion: { (true) in
-                    self.touchIn = false
+                    self.pagePosition = 1
+                    self.pageMoveDone()
                 })
             }else {
                 self.pageMoved(ratio: self.moveRatio, page: _previousPage, direction: .right)
@@ -616,11 +670,11 @@ extension HBNewBookView {
                 }, completion: { (true) in
                     self.currentPage = _previousPage
                     if self.totalPageNumber <= 1 {
-                        self.touchIn = false
+                        self.pagePosition = 0
+                        self.pageMoveDone()
                         return
                     }
                     self.dataPosition = self.preData(current: self.dataPosition)
-                    print("❤️ dataPosition --- \(self.dataPosition)")
                     if let _lastPage = self.totalPages.last {
                         _lastPage.alpha = 0
                         _lastPage.inQueue = false
@@ -637,14 +691,15 @@ extension HBNewBookView {
                             }, completion: { (true) in
                                 _prePage.alpha = 1
                                 self.previousPage = _prePage
-                                self.touchIn = false
+                                self.pagePosition = 1
+                                self.pageMoveDone()
                             })
                         }
                     }
                 })
             }
         }else {
-            self.touchIn = false
+            self.pageMoveDone()
         }
     }
     
