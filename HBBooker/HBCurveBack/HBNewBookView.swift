@@ -320,6 +320,45 @@ extension HBNewBookView {
 
 //MARK: - Methods For Outer
 extension HBNewBookView {
+    /// reloadData
+    func reloadData() -> () {
+        if let _dataSource = dataSource {
+            let totalNumber = _dataSource.hb_pageNumber(self)
+            if totalNumber <= 0 {
+                return
+            }
+        }
+        if self.totalPages.count > 0 || self.totalPageNumber > 0 {
+            return
+        }
+        
+        if let _PageClass = PageClass {
+            self.register(pageClass: _PageClass, reuseIdentifier: reuseIdentifier)
+        }
+    }
+    
+    /// realoda item
+    func reload(item: Int) -> () {
+        if let _dataSource = dataSource {
+            let totalNumber = _dataSource.hb_pageNumber(self)
+            if item > totalNumber || item < 0 || item != dataPosition {
+                return
+            }
+            
+            if let _currentPage = currentPage {
+                for i in 0 ..< totalPages.count {
+                    let page = totalPages[i]
+                    if page == _currentPage {
+                        page.inQueue = false
+                        let _newPage = _dataSource.hb_pageContent(self, index: item)
+                        totalPages[i] = _newPage
+                        break
+                    }
+                }
+            }
+        }
+    }
+    
     /// Register
     func register(pageClass: AnyClass?, reuseIdentifier: String) -> () {
         self.reuseIdentifier = reuseIdentifier

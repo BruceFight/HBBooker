@@ -15,6 +15,7 @@ class HBCurveBackController: UIViewController, HBNewBookViewDelegate, HBNewBookV
     
     let flyButton = UIButton()
     
+    let reloadButton = UIButton()
     override func viewDidLoad() {
         super.viewDidLoad()
         view.layer.masksToBounds = true
@@ -37,6 +38,14 @@ class HBCurveBackController: UIViewController, HBNewBookViewDelegate, HBNewBookV
         flyButton.sizeToFit()
         flyButton.frame = CGRect.init(x: (view.bounds.width - flyButton.bounds.width) / 2, y: bookView.frame.maxY + 10, width: flyButton.bounds.width, height: flyButton.bounds.height)
         view.addSubview(flyButton)
+        
+        reloadButton.setTitle("reload", for: .normal)
+        reloadButton.setTitleColor(.black, for: .normal)
+        reloadButton.titleLabel?.font = UIFont.systemFont(ofSize: 18)
+        reloadButton.addTarget(self, action: #selector(reload), for: .touchUpInside)
+        reloadButton.sizeToFit()
+        reloadButton.frame = CGRect.init(x: (view.bounds.width - reloadButton.bounds.width) / 2, y: flyButton.frame.maxY + 10, width: reloadButton.bounds.width, height: reloadButton.bounds.height)
+        view.addSubview(reloadButton)
     }
     
     @objc func fly() -> () {
@@ -46,6 +55,11 @@ class HBCurveBackController: UIViewController, HBNewBookViewDelegate, HBNewBookV
         }
     }
 
+    @objc func reload() -> () {
+        models[2] = "20"
+        bookView.reload(item: 2)
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
