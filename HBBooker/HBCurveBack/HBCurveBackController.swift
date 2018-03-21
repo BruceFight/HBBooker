@@ -56,7 +56,9 @@ class HBCurveBackController: UIViewController, HBNewBookViewDelegate, HBNewBookV
     }
 
     @objc func reload() -> () {
-        models[2] = "20"
+        if let _ = models.hb_object(for: 2) {
+            models[2] = "20"
+        }
         bookView.reload(item: 2)
     }
     

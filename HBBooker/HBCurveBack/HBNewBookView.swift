@@ -13,6 +13,8 @@ public protocol HBNewBookViewDelegate : class {
     func hb_pageTapped(index: Int) -> ()
     /// 页面翻到了(index位置)
     func hb_pageTo(index: Int) -> ()
+    /// 页面移动
+    func hb_pageMoved(ratio: CGFloat,direction: HBDirection) -> ()
 }
 
 public protocol HBNewBookViewDataSource : class {
@@ -78,6 +80,10 @@ extension HBNewBookView {
             let secondTouchPoint = secondTouch.location(in: UIApplication.shared.keyWindow)
             if let _direction = direction {/// 如果有方向
                 moveRatio = (firstTouchPoint.x - secondTouchPoint.x) / (bounds.width)
+                if let _delegate = delegate {
+                    _delegate.hb_pageMoved(ratio: moveRatio, direction: _direction)
+                }
+                
                 switch _direction {
                 case .left:
                     pageMoveLeft()
@@ -386,7 +392,7 @@ extension HBNewBookView {
         }
     }
     
-    ///
+    /// item: 数据源索引; page: 对应的页
     func reloadPage(item: Int,page: HBNewPageView?) -> () {
         if let _dataSource = dataSource {
             for i in 0 ..< totalPages.count {
@@ -426,6 +432,21 @@ extension HBNewBookView {
     func pageMove(done: ((_ position: Int) -> (Bool))?) -> () {
         if let _currentPage = currentPage {
             if self.totalPageNumber <= 0 { return }
+            if self.totalPageNumber != 1 {
+                if let _pre = previousPage {
+                    reloadPage(item: self.preData(current: self.dataPosition), page: _pre)
+                }
+                if let _currentPage = currentPage {
+                    for i in 0 ..< totalPages.count {
+                        let page = totalPages[i]
+                        if page == _currentPage {
+                            reloadPage(item: self.nextData(current: self.dataPosition), page: totalPages[self.nextPage(current: i)])
+                            break
+                        }
+                    }
+                }
+            }
+            
             if self.touchIn == false {            
                 self.touchIn = true
                 if previousPage == currentPage {
@@ -464,7 +485,6 @@ extension HBNewBookView {
                                 if self.dataPosition >= self.totalPageNumber {
                                     self.dataPosition = 0
                                 }
-                                print("❤️removeDone + dataPosition --- \(self.dataPosition)")
                                 self.removeDoneOperation(nextIndex: nextIndex, _currentPage: _currentPage)
                             }
                         }
