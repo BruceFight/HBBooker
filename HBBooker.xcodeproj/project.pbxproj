@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A1445E02075CCB2007D75CD /* HBCurveBookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1445DE2075CCB2007D75CD /* HBCurveBookView.swift */; };
+		2A1445E12075CCB2007D75CD /* HBCurvePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1445DF2075CCB2007D75CD /* HBCurvePageView.swift */; };
+		2A1445E32075CD36007D75CD /* HBNewCurveBackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1445E22075CD36007D75CD /* HBNewCurveBackController.swift */; };
+		2A1445E52075CE00007D75CD /* TestCurvePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1445E42075CE00007D75CD /* TestCurvePageView.swift */; };
 		2A226DE8204E307B0097D14A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A226DE7204E307B0097D14A /* AppDelegate.swift */; };
 		2A226DEA204E307B0097D14A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A226DE9204E307B0097D14A /* ViewController.swift */; };
 		2A226DED204E307B0097D14A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2A226DEB204E307B0097D14A /* Main.storyboard */; };
@@ -47,6 +51,10 @@
 
 /* Begin PBXFileReference section */
 		29F92BDC518EF5B94E4E721B /* Pods_HBBooker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HBBooker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A1445DE2075CCB2007D75CD /* HBCurveBookView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HBCurveBookView.swift; sourceTree = "<group>"; };
+		2A1445DF2075CCB2007D75CD /* HBCurvePageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HBCurvePageView.swift; sourceTree = "<group>"; };
+		2A1445E22075CD36007D75CD /* HBNewCurveBackController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HBNewCurveBackController.swift; sourceTree = "<group>"; };
+		2A1445E42075CE00007D75CD /* TestCurvePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCurvePageView.swift; sourceTree = "<group>"; };
 		2A226DE4204E307B0097D14A /* HBBooker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HBBooker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A226DE7204E307B0097D14A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2A226DE9204E307B0097D14A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -103,6 +111,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2A1445DD2075CCB2007D75CD /* HBNewCurveBack */ = {
+			isa = PBXGroup;
+			children = (
+				2A1445E22075CD36007D75CD /* HBNewCurveBackController.swift */,
+				2A1445DE2075CCB2007D75CD /* HBCurveBookView.swift */,
+				2A1445DF2075CCB2007D75CD /* HBCurvePageView.swift */,
+				2A1445E42075CE00007D75CD /* TestCurvePageView.swift */,
+			);
+			path = HBNewCurveBack;
+			sourceTree = "<group>";
+		};
 		2A226DDB204E307B0097D14A = {
 			isa = PBXGroup;
 			children = (
@@ -131,6 +150,7 @@
 				2A226DE7204E307B0097D14A /* AppDelegate.swift */,
 				2A226DE9204E307B0097D14A /* ViewController.swift */,
 				2A89E1E5205A1EB700F4EE79 /* HBCurveBack */,
+				2A1445DD2075CCB2007D75CD /* HBNewCurveBack */,
 				2A89E1DE205A1EB700F4EE79 /* HBCurveDisappear */,
 				2A226DEB204E307B0097D14A /* Main.storyboard */,
 				2A226DEE204E307B0097D14A /* Assets.xcassets */,
@@ -393,6 +413,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2A1445E32075CD36007D75CD /* HBNewCurveBackController.swift in Sources */,
 				2A89E1E8205A1EB700F4EE79 /* HBCurveDisappearController.swift in Sources */,
 				2A226DEA204E307B0097D14A /* ViewController.swift in Sources */,
 				2A89E1F3205A1FC500F4EE79 /* TestNewPageView.swift in Sources */,
@@ -403,8 +424,11 @@
 				2A89E1ED205A1ED800F4EE79 /* HBCurveBackController.swift in Sources */,
 				2A89E1E9205A1EB700F4EE79 /* HBPageView.swift in Sources */,
 				2A89E1F2205A1FC500F4EE79 /* HBNewBookView.swift in Sources */,
+				2A1445E12075CCB2007D75CD /* HBCurvePageView.swift in Sources */,
+				2A1445E02075CCB2007D75CD /* HBCurveBookView.swift in Sources */,
 				2A89E1F1205A1FC500F4EE79 /* HBNewPageView.swift in Sources */,
 				2A89E1EA205A1EB700F4EE79 /* HBParams.swift in Sources */,
+				2A1445E52075CE00007D75CD /* TestCurvePageView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
